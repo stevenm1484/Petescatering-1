@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Webnara Admin — Directory of US businesses that don't have a website.">
+  <title>Webnara Admin — Lead Directory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="login-overlay" id="loginOverlay">
+    <form class="login-card" id="loginForm">
+      <div class="login-logo">
+        <img src="../logo.png" alt="Webnara logo" class="logo-mark">
+        <span class="logo-word">Web<span>nara</span></span>
+        <span class="login-admin-tag">Admin</span>
+      </div>
+      <h1>Sign in</h1>
+      <p class="login-sub">This area is restricted. Enter your admin credentials.</p>
+      <div class="login-field">
+        <label for="loginUser">Username</label>
+        <input type="text" id="loginUser" autocomplete="username" required autofocus>
+      </div>
+      <div class="login-field">
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" autocomplete="current-password" required>
+      </div>
+      <p class="login-error" id="loginError" hidden>Incorrect username or password.</p>
+      <button type="submit" class="login-btn">Sign in</button>
+    </form>
+  </div>
+
+  <header class="header app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <a href="#" class="logo">
+          <img src="../logo.png" alt="Webnara logo" class="logo-mark">
+          <span class="logo-word">Web<span>nara</span></span>
+          <span class="admin-badge">Admin</span>
+        </a>
+        <span class="header-sep" aria-hidden="true"></span>
+        <span class="header-title">Lead Directory</span>
+      </div>
+      <button class="signout-btn" id="signOutBtn" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <section class="hero dashboard">
+    <div class="hero-inner dashboard-inner">
+      <div class="dashboard-head">
+        <p class="dashboard-eyebrow">Overview</p>
+        <h1>Business leads without a website</h1>
+        <p class="dashboard-desc">Real US businesses verified through Google's own data — operating, rated, and with phone numbers you can call.</p>
+      </div>
+      <div class="hero-stats stat-grid">
+        <article class="hero-stat stat-card stat-card-primary">
+          <span class="hero-stat-num" id="totalCount">—</span>
+          <span class="hero-stat-label">Businesses listed</span>
+        </article>
+        <article class="hero-stat stat-card">
+          <span class="hero-stat-num" id="stateCount">—</span>
+          <span class="hero-stat-label">States covered</span>
+        </article>
+        <article class="hero-stat stat-card">
+          <span class="hero-stat-num" id="industryCount">—</span>
+          <span class="hero-stat-label">Industries</span>
+        </article>
+        <article class="hero-stat stat-card stat-card-warn">
+          <span class="hero-stat-num" id="inMakingCount">—</span>
+          <span class="hero-stat-label">Websites in Making</span>
+        </article>
+        <article class="hero-stat stat-card stat-card-accent">
+          <span class="hero-stat-num" id="finishedHeroCount">—</span>
+          <span class="hero-stat-label">Finished clients</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <main class="main">
+    <aside class="filters">
+      <div class="filters-header">
+        <h2>Filters</h2>
+        <button class="clear-btn" id="clearFilters" type="button">Clear all</button>
+      </div>
+
+      <div class="filter-group search-group">
+        <label for="search">Search</label>
+        <div class="search-wrap">
+          <input type="search" id="search" placeholder="Business, city, or state (e.g. SC)..." autocomplete="off" aria-autocomplete="list" aria-controls="searchSuggestions" aria-expanded="false">
+          <ul class="search-suggestions" id="searchSuggestions" role="listbox" hidden></ul>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label for="stateFilter">State</label>
+        <select id="stateFilter">
+          <option value="">All states</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="industryFilter">Industry</label>
+        <select id="industryFilter">
+          <option value="">All industries</option>
+        </select>
+      </div>
+
+      <div class="filter-note" id="filterNote">
+        <strong>Verified by Google data.</strong> Every listing comes from the Google Places API — an operating business with a phone number and an empty website field on its Google profile.
+      </div>
+    </aside>
+
+    <section class="results results-panel">
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" type="button" data-tab="directory" id="tabDirectory">Businesses</button>
+        <button class="tab-btn" type="button" data-tab="quotes" id="tabQuotes">Quote Requests</button>
+        <button class="tab-btn" type="button" data-tab="inprogress" id="tabInProgress">Websites in Making</button>
+        <button class="tab-btn" type="button" data-tab="finished" id="tabFinished">Finished Clients</button>
+      </div>
+
+      <div id="businessPanel" class="tab-panel">
+        <div class="results-header" id="resultsHeader">
+          <p id="resultsCount">Loading...</p>
+          <select id="sortBy" class="sort-select">
+            <option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option>
+            <option value="state-asc">State A–Z</option>
+            <option value="industry-asc">Industry A–Z</option>
+            <option value="reviews-asc">Reviews: Low to High</option>
+            <option value="reviews-desc">Reviews: High to Low</option>
+          </select>
+        </div>
+
+        <div class="company-list" id="companyList"></div>
+
+        <div class="empty-state" id="emptyState" hidden>
+          <span class="empty-icon">∅</span>
+          <h3 id="emptyTitle">No businesses match</h3>
+          <p id="emptyText">Try adjusting your filters or search term.</p>
+        </div>
+
+        <nav class="pagination" id="pagination" aria-label="Pagination"></nav>
+      </div>
+
+      <div id="quotesPanel" class="tab-panel" hidden>
+        <div class="quotes-panel-header">
+          <div>
+            <h2 class="quotes-panel-title">Free quote requests</h2>
+            <p class="quotes-panel-sub">Only people who submitted the contact form on your Webnara site appear here — not your business directory.</p>
+          </div>
+          <p class="quotes-panel-count" id="quotesCount">0 requests</p>
+        </div>
+
+        <div class="quotes-list" id="quotesList"></div>
+
+        <div class="empty-state quotes-empty" id="quotesEmpty" hidden>
+          <span class="empty-icon">✉</span>
+          <h3>No quote requests yet</h3>
+          <p>When someone fills out the contact form on Webnara and clicks “Request my free quote,” their info will show up here.</p>
+        </div>
+      </div>
+
+      <div id="finishedPanel" class="tab-panel" hidden>
+        <div class="quotes-panel-header">
+          <div>
+            <h2 class="quotes-panel-title">Finished clients</h2>
+            <p class="quotes-panel-sub">Websites you've completed and launched. Moved here from Websites in Making when the build is done.</p>
+          </div>
+          <p class="quotes-panel-count" id="finishedCount">0 clients</p>
+        </div>
+
+        <div class="company-list" id="finishedList"></div>
+
+        <div class="empty-state" id="finishedEmpty" hidden>
+          <span class="empty-icon">✓</span>
+          <h3>No finished clients yet</h3>
+          <p>When a website is complete, click “Move to Finished Clients” on a card in Websites in Making.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-brand">Webnara Admin</p>
+      <p class="footer-disclaimer">Verified lead data from Google Places API · Businesses without a website on their Google profile</p>
+    </div>
+  </footer>
+
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close">&times;</button>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="confirmOverlay" hidden>
+    <div class="modal confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="modal-content">
+        <h3 id="confirmTitle" class="confirm-title">Delete this business?</h3>
+        <p class="confirm-text" id="confirmText"></p>
+        <div class="confirm-actions">
+          <button class="modal-btn modal-btn-secondary" id="confirmCancel" type="button">Cancel</button>
+          <button class="modal-btn modal-btn-danger" id="confirmDelete" type="button">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="places-data.js"></script>
+  <script src="owners-data.js"></script>
+  <script src="emails-data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

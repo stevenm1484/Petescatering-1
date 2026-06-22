@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGap — API Usage & Cost</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0;
+      --text: #0f172a; --text-muted: #64748b;
+      --accent: #2563eb; --accent-soft: #eff6ff;
+      --green: #16a34a; --amber: #d97706; --red: #dc2626;
+      --font: 'Inter', system-ui, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 2rem 1rem; }
+    .wrap { max-width: 860px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .sub { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+    .card h2 { font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+    .big { font-size: 1.75rem; font-weight: 700; }
+    .big small { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
+    .bar { height: 8px; background: var(--border); border-radius: 100px; margin-top: 0.75rem; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 100px; background: var(--green); transition: width 0.3s; }
+    .bar-fill.warn { background: var(--amber); }
+    .bar-fill.over { background: var(--red); }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--border); }
+    th { background: var(--accent-soft); color: var(--accent); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:last-child td { border-bottom: none; }
+    .section-title { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+    .ok { color: var(--green); font-weight: 600; }
+    .error { color: var(--red); font-weight: 600; }
+    .empty { background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>API Usage &amp; Cost</h1>
+    <p class="sub" id="generatedAt">No data yet</p>
+
+    <div class="cards">
+      <div class="card">
+        <h2>Requests today</h2>
+        <div class="big" id="todayCount">0 <small id="todayLimit">/ — daily limit</small></div>
+        <div class="bar"><div class="bar-fill" id="todayBar" style="width:0%"></div></div>
+      </div>
+      <div class="card">
+        <h2>Estimated cost this month</h2>
+        <div class="big" id="monthCost">$0.00 <small id="monthBudget">/ $— budget</small></div>
+        <div class="bar"><div class="bar-fill" id="costBar" style="width:0%"></div></div>
+      </div>
+      <div class="card">
+        <h2>Requests this month</h2>
+        <div class="big" id="monthCount">0</div>
+      </div>
+    </div>
+
+    <div class="section-title">Cost by API type</div>
+    <div id="skuTableWrap"><div class="empty">No API requests logged yet. Numbers appear here automatically once the pipeline starts making calls.</div></div>
+
+    <div class="section-title">Recent requests (last 50)</div>
+    <div id="logTableWrap"><div class="empty">No requests yet.</div></div>
+  </div>
+
+  <script src="api-usage-data.js"></script>
+  <script>
+    function fmtUSD(n) { return '$' + Number(n).toFixed(2); }
+
+    if (typeof API_USAGE !== 'undefined' && API_USAGE.summary) {
+      const s = API_USAGE.summary;
+      document.getElementById('generatedAt').textContent = 'Last updated: ' + API_USAGE.generatedAt;
+      document.getElementById('todayCount').firstChild.textContent = s.todayCount + ' ';
+      document.getElementById('todayLimit').textContent = '/ ' + s.dailyRequestLimit + ' daily limit';
+      document.getElementById('monthCost').firstChild.textContent = fmtUSD(s.monthCostUSD) + ' ';
+      document.getElementById('monthBudget').textContent = '/ ' + fmtUSD(s.monthlyBudgetUSD) + ' budget';
+      document.getElementById('monthCount').textContent = s.monthCount;
+
+      const todayPct = Math.min(100, (s.todayCount / s.dailyRequestLimit) * 100);
+      const todayBar = document.getElementById('todayBar');
+      todayBar.style.width = todayPct + '%';
+      todayBar.className = 'bar-fill' + (todayPct >= 100 ? ' over' : todayPct >= 75 ? ' warn' : '');
+
+      const costPct = Math.min(100, (s.monthCostUSD / s.monthlyBudgetUSD) * 100);
+      const costBar = document.getElementById('costBar');
+      costBar.style.width = costPct + '%';
+      costBar.className = 'bar-fill' + (costPct >= 100 ? ' over' : costPct >= 75 ? ' warn' : '');
+
+      if (s.skus && s.skus.length) {
+        document.getElementById('skuTableWrap').innerHTML = `
+          <table>
+            <tr><th>API type</th><th>Calls this month</th><th>Free / month</th><th>Billable calls</th><th>Est. cost</th></tr>
+            ${s.skus.map(k => `
+              <tr>
+                <td>${k.label}</td>
+                <td>${k.monthCount}</td>
+                <td>${k.freeCallsPerMonth.toLocaleString()}</td>
+                <td>${k.billableCalls}</td>
+                <td>${fmtUSD(k.estCostUSD)}</td>
+              </tr>`).join('')}
+          </table>`;
+      }
+
+      if (API_USAGE.recentRequests && API_USAGE.recentRequests.length) {
+        document.getElementById('logTableWrap').innerHTML = `
+          <table>
+            <tr><th>Time</th><th>API type</th><th>Status</th><th>Est. cost</th></tr>
+            ${API_USAGE.recentRequests.map(r => `
+              <tr>
+                <td>${r.timestamp}</td>
+                <td>${r.sku}</td>
+                <td class="${r.status === 'ok' ? 'ok' : 'error'}">${r.status}</td>
+                <td>${fmtUSD(r.estCostUSD)}</td>
+              </tr>`).join('')}
+          </table>`;
+      }
+    }
+  </script>
+</body>
+</html>

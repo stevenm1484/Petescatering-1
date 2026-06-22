@@ -1,0 +1,16 @@
+{
+  "dailyRequestLimit": 500,
+  "monthlyBudgetUSD": 20,
+  "skus": {
+    "textSearchPro": {
+      "label": "Places Text Search (Enterprise)",
+      "pricePerCallUSD": 0.035,
+      "freeCallsPerMonth": 1000
+    },
+    "placeDetailsPro": {
+      "label": "Place Details (Enterprise)",
+      "pricePerCallUSD": 0.02,
+      "freeCallsPerMonth": 1000
+    }
+  }
+}

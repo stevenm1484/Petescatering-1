@@ -1,0 +1,12 @@
+# Never commit secrets
+.env
+
+# Local API usage logs
+api/api-usage.json
+api/api-usage-data.js
+
+# Personal lead-tracking state (deleted / in-progress businesses)
+api/webgap-state.json
+
+# Contact form quote requests from Webnara
+api/leads.json
