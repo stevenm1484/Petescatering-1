@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: webnara
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+    # For persistent leads/admin state, upgrade to Starter ($7/mo) and uncomment:
+    # plan: starter
+    # envVars:
+    #   - key: DATA_DIR
+    #     value: /var/data
+    # disk:
+    #   name: webnara-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
